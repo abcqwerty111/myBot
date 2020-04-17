@@ -82,7 +82,6 @@ def working(message):
     cid = message.chat.id
     nick = message.from_user.first_name
     mt = message.text
-    mt = mt.capitalize()
     main_buttons = types.ReplyKeyboardMarkup(resize_keyboard=True)
     main_buttons.add('Мои данные', 'О нас', 'Оборудование')
     main_buttons.add('Галерея', 'Контакты', 'Сотрудники')
@@ -91,6 +90,10 @@ def working(message):
     logo_original = 'https://psv4.userapi.com/c856224/u232799244/docs/d8/ba8ba5cf0adb/logo_original.png?extra=7-u5wDzEK1RgX_ooyE7sRdJOJ_2FhO0kzi0GCqYktItpI1c_I28w0xMy5Clq9iwO4lgfxKFVT2Yz9do-ax2ob6KdJCOR8VBCVoJAqT-4agYEFyyXgKMrozXeDVQkW38_M8o5CGU16rIPtZ8NKt3H0hl1'
     ids = []
     equipment = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    video_gallery = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    video_gallery.add('UCK видео о компании')
+    video_gallery.add('Тест на засыпание водителя')
+    video_gallery.add('Галерея')
     for row in cur.execute('SELECT * FROM telegram_users'):
         ids.append(str(row[1]))
     if str(cid) in ids:
@@ -125,7 +128,41 @@ ID: {row[1]}
                {row[6]}'''.replace('None', '')
                     bot.send_message(cid, contacts, reply_markup=main_buttons)
             elif mt == 'Галерея':
-                pass
+                photo_video = types.ReplyKeyboardMarkup(resize_keyboard=True)
+                photo_video.add('Фото', 'Видео')
+                photo_video.add('Назад')
+                bot.send_message(cid, 'Что Вы хотите посмотреть?', reply_markup=photo_video)
+            elif mt == 'Фото':
+                photo_gallery = types.ReplyKeyboardMarkup(resize_keyboard=True)
+                photo_gallery.add(
+                    'Установка cистемы кругового обзора на 360* с функцией видеорегистратора. KAZMinerals')
+                photo_gallery.add(
+                    'Установка системы контроля и предупреждения усталости водителя')
+                photo_gallery.add(
+                    'Рабочая поездка на Соколовско-Сарбайское месторождение. ССГПО. ERG')
+                photo_gallery.add(
+                    'Галерея')
+                bot.send_message(cid, 'Все фото:', reply_markup=photo_gallery)
+            elif mt == 'Установка cистемы кругового обзора на 360* с функцией видеорегистратора. KAZMinerals':
+                bot.send_message(cid, mt)
+                for row in cur.execute(f'SELECT * FROM photo_gallery WHERE Name = "{mt}"'):
+                    bot.send_photo(cid, row[3])
+            elif mt == 'Установка системы контроля и предупреждения усталости водителя':
+                bot.send_message(cid, mt)
+                for row in cur.execute(f'SELECT * FROM photo_gallery WHERE Name = "{mt}"'):
+                    bot.send_photo(cid, row[3])
+            elif mt == 'Рабочая поездка на Соколовско-Сарбайское месторождение. ССГПО. ERG':
+                bot.send_message(cid, mt)
+                for row in cur.execute(f'SELECT * FROM photo_gallery WHERE Name = "{mt}"'):
+                    bot.send_photo(cid, row[3])
+            elif mt == 'Видео':
+                bot.send_message(cid, 'Все видео:', reply_markup=video_gallery)
+            elif mt == 'UCK видео о компании':
+                video1 = 'video1.mp4'
+                bot.send_video(cid, video1, reply_markup=video_gallery)
+            elif mt == 'Тест на засыпание водителя':
+                video2 = 'video1.mp4'
+                bot.send_video(cid, video2, reply_markup=video_gallery)
             elif mt == 'Сотрудники':
                 pass
             for row in cur.execute('SELECT * FROM Equipment'):
