@@ -61,7 +61,9 @@ def registration(message):
                 name = fio[1].capitalize()
                 otch = ''
             else:
-                bot.send_message(cid, 'Напишите свои ФИО через "_".\nПример: Нурпеисов_Ербол_Мендыбаевич\nБудьте внимательны!')
+                bot.send_message(cid, '''Напишите свои ФИО через "_".
+Пример: Нурпеисов_Ербол_Мендыбаевич
+Будьте внимательны!''')
             cur.execute('INSERT INTO telegram_users (message_chat_id, Fam, Name, Otch, Nickname) VALUES (?, ?, ?, ?, ?)', (cid, fam, name, otch, nick))
             con.commit()
             for row in cur.execute('SELECT * FROM telegram_users'):
@@ -94,6 +96,8 @@ def working(message):
     video_gallery.add('UCK видео о компании')
     video_gallery.add('Тест на засыпание водителя')
     video_gallery.add('Галерея')
+    employees = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    update_delete = types.ReplyKeyboardMarkup(resize_keyboard=True)
     for row in cur.execute('SELECT * FROM telegram_users'):
         ids.append(str(row[1]))
     if str(cid) in ids:
@@ -118,7 +122,8 @@ ID: {row[1]}
                 equipment.add('Назад')
                 bot.send_message(cid, 'Оборудование UCK:', reply_markup=equipment)
             elif mt == 'Контакты':
-                bot.send_message(cid, 'Казахстан, Карагандинская область, г. Караганда, Ул.Ленина, строение 6\nТел: +7 (7212) 922-572, +7 (775) 915-0910')
+                bot.send_message(cid, '''Казахстан, Карагандинская область, г. Караганда, Ул.Ленина, строение 6
+Тел: +7 (7212) 922-572, +7 (775) 915-0910''')
                 for row in cur.execute('SELECT * FROM Contacts'):
                     contacts = f'''{row[1]}
 {row[2]}
@@ -158,13 +163,54 @@ ID: {row[1]}
             elif mt == 'Видео':
                 bot.send_message(cid, 'Все видео:', reply_markup=video_gallery)
             elif mt == 'UCK видео о компании':
-                video1 = 'video1.mp4'
-                bot.send_video(cid, video1, reply_markup=video_gallery)
+                video1 = 'https://youtu.be/VS-Rbzk16B4'
+                bot.send_message(cid, video1, reply_markup=video_gallery)
             elif mt == 'Тест на засыпание водителя':
-                video2 = 'video1.mp4'
-                bot.send_video(cid, video2, reply_markup=video_gallery)
+                video2 = 'https://www.youtube.com/watch?v=w6_q8PgW_vg'
+                bot.send_message(cid, video2, reply_markup=video_gallery)
             elif mt == 'Сотрудники':
-                pass
+                for row in cur.execute('SELECT * FROM Employees ORDER BY F'):
+                    if len(str(row[4])) == 2:
+                        str_day = str(row[4])
+                    elif len(str(row[4])) == 1:
+                        str_day = '0' + str(row[4])
+                    else:
+                        str_day = '01'
+                    if len(str(row[5])) == 2:
+                        str_month = str(row[5])
+                    elif len(str(row[5])) == 1:
+                        str_month = '0' + str(row[5])
+                    else:
+                        str_month = '01'
+                    if len(str(row[6])) == 4:
+                        str_year = str(row[6])
+                    else:
+                        str_year = '2000'
+                    if int(row[5]) < int(time.strftime('%m')):
+                        age = str(int(time.strftime('%Y')) - int(row[6]))
+                    elif int(row[5]) > int(time.strftime('%m')):
+                        age = str(int(time.strftime('%Y')) - int(row[6]) - 1)
+                    elif int(row[5]) == int(time.strftime('%m')):
+                        if int(row[4]) < int(time.strftime('%d')):
+                            age = str(int(time.strftime('%Y')) - int(row[6]))
+                        elif int(row[4]) >= int(time.strftime('%d')):
+                            age = str(int(time.strftime('%Y')) - int(row[6]) - 1)
+                    employeer = row[1] + ' ' + row[2] + ' ' + row[3] + ' | ' + age + '\n' + row[8] + '\n' + row[7]
+                    employees.add(employeer)
+                employees.add('Добавить запись')
+                employees.add('Назад')
+                bot.send_message(cid, 'Сотрудники Umbrella Corporation Kazakhstan', reply_markup=employees)
+            elif mt == 'Изменить':
+                pre_message = str((message.message_id - 2).text)
+                bot.send_message(cid, pre_message)
+            for row in cur.execute('SELECT * FROM Employees'):
+                if row[1] + ' ' + row[2] + ' ' + row[3] in mt:
+                    if row[8] + '\n' + row[7] in mt:
+                        update_delete.add('Изменить')
+                        update_delete.add('Удалить')
+                        update_delete.add('Сотрудники')
+                        fio = row[1] + ' ' + row[2] + ' ' + row[3]
+                        bot.send_message(cid, fio, reply_markup=update_delete)
             for row in cur.execute('SELECT * FROM Equipment'):
                 if mt == row[1].replace('_', ' '):
                     bot.send_photo(cid, row[5])
@@ -175,11 +221,13 @@ ID: {row[1]}
     elif str(cid) not in ids:
         registration(message)
 
+
 def delete_me(message):
     con = sqlite3.connect('UCK.sqlite3')
     cur = con.cursor()
     cid = message.chat.id
     nick = message.from_user.first_name
     mt = message.text
+
 
 bot.polling(none_stop = True)
