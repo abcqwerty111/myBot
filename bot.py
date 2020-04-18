@@ -7,6 +7,7 @@ bot = telebot.TeleBot('878479849:AAE6JYUMCYfslkFC_ZOGsh9SQCx3BXL3tTQ')
 
 @bot.message_handler(commands=['help', 'start'])
 def send_welcome(message):
+    xxx = 0
     con = sqlite3.connect('UCK.sqlite3')
     cur = con.cursor()
     cid = message.chat.id
@@ -111,16 +112,20 @@ ID: {row[1]}
 Ник: {row[5]}''', reply_markup=main_buttons)
             elif mt == 'Назад':
                 bot.send_message(cid, 'Что бы Вы хотели сделать?', reply_markup=main_buttons)
+                xxx -= md
+                print(xxx)
             elif mt == 'О нас':
                 bot.send_photo(cid, logo_original)
                 time.sleep(0.1)
                 for row in cur.execute('SELECT * FROM about_us_text'):
                     bot.send_message(cid, row[1], reply_markup=main_buttons)
             elif mt == 'Оборудование':
+                md = 1
                 for row in cur.execute('SELECT * FROM Equipment'):
                     equipment.add(row[1].replace('_', ' '))
                 equipment.add('Назад')
                 bot.send_message(cid, 'Оборудование UCK:', reply_markup=equipment)
+                xxx += md
             elif mt == 'Контакты':
                 bot.send_message(cid, '''Казахстан, Карагандинская область, г. Караганда, Ул.Ленина, строение 6
 Тел: +7 (7212) 922-572, +7 (775) 915-0910''')
@@ -133,10 +138,12 @@ ID: {row[1]}
                {row[6]}'''.replace('None', '')
                     bot.send_message(cid, contacts, reply_markup=main_buttons)
             elif mt == 'Галерея':
+                md = 2
                 photo_video = types.ReplyKeyboardMarkup(resize_keyboard=True)
                 photo_video.add('Фото', 'Видео')
                 photo_video.add('Назад')
                 bot.send_message(cid, 'Что Вы хотите посмотреть?', reply_markup=photo_video)
+                xxx += md
             elif mt == 'Фото':
                 photo_gallery = types.ReplyKeyboardMarkup(resize_keyboard=True)
                 photo_gallery.add(
@@ -169,6 +176,7 @@ ID: {row[1]}
                 video2 = 'https://www.youtube.com/watch?v=w6_q8PgW_vg'
                 bot.send_message(cid, video2, reply_markup=video_gallery)
             elif mt == 'Сотрудники':
+                md = 3
                 for row in cur.execute('SELECT * FROM Employees ORDER BY F'):
                     if len(str(row[4])) == 2:
                         str_day = str(row[4])
@@ -200,9 +208,13 @@ ID: {row[1]}
                 employees.add('Добавить запись')
                 employees.add('Назад')
                 bot.send_message(cid, 'Сотрудники Umbrella Corporation Kazakhstan', reply_markup=employees)
+                xxx += md
             elif mt == 'Изменить':
-                pre_message = str((message.message_id - 2).text)
+                pre_message = str(message.message_id - 2)
                 bot.send_message(cid, pre_message)
+            elif mt == 'Добавить запись':
+                bot.send_message(cid, '''Чтобы добавить запись, отправьте данные, разделяя их  символом " | "
+Пример: Нурпеисов Ербол Мендыбаевич | 07.06.1998 | Отдел примеров | Руководитель создания примеров''')
             for row in cur.execute('SELECT * FROM Employees'):
                 if row[1] + ' ' + row[2] + ' ' + row[3] in mt:
                     if row[8] + '\n' + row[7] in mt:
