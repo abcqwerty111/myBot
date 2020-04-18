@@ -195,7 +195,7 @@ ID: {row[1]}
                             age = str(int(time.strftime('%Y')) - int(row[6]))
                         elif int(row[4]) >= int(time.strftime('%d')):
                             age = str(int(time.strftime('%Y')) - int(row[6]) - 1)
-                    employeer = row[1] + ' ' + row[2] + ' ' + row[3] + ' | ' + age + '\n' + row[8] + '\n' + row[7]
+                    employeer = row[1] + ' ' + row[2] + ' ' + row[3] + ', ' + age + '\n' + row[8] + '\n' + row[7]
                     employees.add(employeer)
                 employees.add('Добавить запись')
                 employees.add('Назад')
@@ -204,8 +204,51 @@ ID: {row[1]}
                 pre_message = str(message.message_id - 2)
                 bot.send_message(cid, pre_message)
             elif mt == 'Добавить запись':
-                bot.send_message(cid, '''Чтобы добавить запись, отправьте данные, разделяя их  символом " | "
-Пример: Нурпеисов Ербол Мендыбаевич | 07.06.1998 | Отдел примеров | Руководитель создания примеров''')
+                bot.send_message(cid, '''Чтобы добавить запись, отправьте данные, разделяя их  символом
+" | ". Пример:
+Фамилия Имя Отчество | 01.01.1991 | Отдел | Должность''')
+            elif ' | ' in mt:
+                datas = mt.split(' | ')
+                billy = 0
+                for x in datas:
+                    billy += 1
+                if billy == 4:
+                    fio = datas[0]
+                    b_date = datas[1]
+                    department = datas[2].capitalize()
+                    position = datas[3].capitalize()
+                else:
+                    answer = 'Проверьте правильность написания!'
+                fio = fio.split(' ')
+                count = 0
+                for i in fio:
+                    count += 1
+                if count == 3:
+                    name1 = fio[0].capitalize()
+                    name2 = fio[1].capitalize()
+                    name3 = fio[2].capitalize()
+                elif count == 2:
+                    name1 = fio[0].capitalize()
+                    name2 = fio[1].capitalize()
+                    name3 = ''
+                else:
+                    answer = 'Проверьте правильность написания!'
+                b_date = b_date.split('.')
+                b_count = 0
+                for r in b_date:
+                    b_count += 1
+                if b_count == 3:
+                    b_day = b_date[0]
+                    b_month = b_date[1]
+                    b_year = b_date[2]
+                else:
+                    answer = 'Проверьте правильность написания!'
+                if answer == 'Проверьте правильность написания!':
+                    bot.send_message(cid, ':(')
+                else:
+                    cur.execute('INSERT INTO Employees (F, I, O, Day, Month, Year, Department, Position) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (name1, name2, name3, int(b_day), int(b_month), int(b_year), department, position))
+                    con.commit()
+                    bot.send_message(cid, ':)', reply_markup=employees)
             for row in cur.execute('SELECT * FROM Employees'):
                 if row[1] + ' ' + row[2] + ' ' + row[3] in mt:
                     if row[8] + '\n' + row[7] in mt:
