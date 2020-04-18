@@ -2,6 +2,7 @@
 import telebot, sqlite3
 from telebot import *
 import time
+from datetime import date
 
 bot = telebot.TeleBot('878479849:AAE6JYUMCYfslkFC_ZOGsh9SQCx3BXL3tTQ')
 
@@ -244,6 +245,10 @@ ID: {row[1]}
                 else:
                     bot.send_message(cid, 'Проверьте правильность написания даты!')
                 try:
+                    b_day = int(b_day)
+                    b_month = int(b_month)
+                    b_year = int(b_year)
+                    date(b_year, b_month, b_day)
                     cur.execute('INSERT INTO Employees (F, I, O, Day, Month, Year, Department, Position) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (name1, name2, name3, int(b_day), int(b_month), int(b_year), department, position))
                     con.commit()
                     bot.send_message(cid, ':)', reply_markup=employees)
@@ -266,7 +271,7 @@ ID: {row[1]}
 
     elif str(cid) not in ids:
         registration(message)
-
+        
 
 def delete_me(message):
     con = sqlite3.connect('UCK.sqlite3')
