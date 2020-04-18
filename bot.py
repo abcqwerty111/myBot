@@ -218,7 +218,7 @@ ID: {row[1]}
                     department = datas[2].capitalize()
                     position = datas[3].capitalize()
                 else:
-                    answer = 'Проверьте правильность написания!'
+                    bot.send_message(cid, 'Проверьте правильность написания!')
                 fio = fio.split(' ')
                 count = 0
                 for i in fio:
@@ -232,7 +232,7 @@ ID: {row[1]}
                     name2 = fio[1].capitalize()
                     name3 = ''
                 else:
-                    answer = 'Проверьте правильность написания!'
+                    bot.send_message(cid, 'Проверьте правильность написания ФИО!')
                 b_date = b_date.split('.')
                 b_count = 0
                 for r in b_date:
@@ -242,13 +242,13 @@ ID: {row[1]}
                     b_month = b_date[1]
                     b_year = b_date[2]
                 else:
-                    answer = 'Проверьте правильность написания!'
-                if answer == 'Проверьте правильность написания!':
-                    bot.send_message(cid, ':(')
-                else:
+                    bot.send_message(cid, 'Проверьте правильность написания даты!')
+                try:
                     cur.execute('INSERT INTO Employees (F, I, O, Day, Month, Year, Department, Position) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (name1, name2, name3, int(b_day), int(b_month), int(b_year), department, position))
                     con.commit()
                     bot.send_message(cid, ':)', reply_markup=employees)
+                except:
+                    bot.send_message(cid, 'Проверьте правильность написания!')
             for row in cur.execute('SELECT * FROM Employees'):
                 if row[1] + ' ' + row[2] + ' ' + row[3] in mt:
                     if row[8] + '\n' + row[7] in mt:
