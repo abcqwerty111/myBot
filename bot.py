@@ -252,8 +252,10 @@ ID: {row[1]}
                     cur.execute('INSERT INTO Employees (F, I, O, Day, Month, Year, Department, Position) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (name1, name2, name3, int(b_day), int(b_month), int(b_year), department, position))
                     con.commit()
                     bot.send_message(cid, ':)', reply_markup=employees)
+                    bot.send_message(888833912, f'Пользователь {cid}/{nick} добавил запись: Сотрудники ({name1}, {name2}, {name3}, {int(b_day)}, {int(b_month)}, {int(b_year)}, {department}, {position})')
                 except:
                     bot.send_message(cid, 'Проверьте правильность написания!')
+                    bot.send_message(888833912, f'Пользователь {cid}/{nick} пытался добавить запись: Сотрудники ({mt})')
             for row in cur.execute('SELECT * FROM Employees'):
                 if row[1] + ' ' + row[2] + ' ' + row[3] in mt:
                     if row[8] + '\n' + row[7] in mt:
