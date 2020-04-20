@@ -286,7 +286,7 @@ ID: {row[1]}
                     xemployeer = '[X] ' + row[1] + ' ' + row[2] + ' ' + row[3] + ', ' + age + '\n' + row[8] + '\n' + row[7]
                     xemployees.add(xemployeer)
                 xemployees.add('Сотрудники')    
-                bot.send_mesaage(cid, 'Удаление записи. Будьте внимательны, не будет никаких вопросов по типу "Действительно ли Вы хотите удалить запись?". Кроме того, все Ваши действия с базой данных записываются.', reply_markup=xemployees)
+                bot.send_message(cid, 'Удаление записи. Будьте внимательны, не будет никаких вопросов по типу "Действительно ли Вы хотите удалить запись?". Кроме того, все Ваши действия с базой данных записываются.', reply_markup=xemployees)
             for row in cur.execute('SELECT * FROM Employees'):
                 if '[X] ' in mt:
                     try:
