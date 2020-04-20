@@ -303,10 +303,10 @@ ID: {row[1]}
                         cur.execute(f'DELETE FROM Employees WHERE F = "{fio1}" AND I = "{fio2}" AND Position = "{position}" AND Department = "{department}"')
                         con.commit()
                         bot.send_message(cid, 'Запись удалена.')
-                        bot.send_message(888833912, f'Пользователь {cid}/{nick} удалил запись: Сотрудники ({mt.replace('[X] ', '')})')
+                        bot.send_message(888833912, f'Пользователь {cid}/{nick} удалил запись: Сотрудники ({mt.replace("[X] ", "")})')
                     except:
                         bot.send_message(cid, 'Запись не удалена.')
-                        bot.send_message(888833912, f'Пользователь {cid}/{nick} пытался удалить запись: Сотрудники ({mt.replace('[X] ', '')})')
+                        bot.send_message(888833912, f'Пользователь {cid}/{nick} пытался удалить запись: Сотрудники ({mt.replace("[X] ", "")})')
             for row in cur.execute('SELECT * FROM Equipment'):
                 if mt == row[1].replace('_', ' '):
                     bot.send_photo(cid, row[5])
