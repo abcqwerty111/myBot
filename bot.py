@@ -98,6 +98,7 @@ def working(message):
     video_gallery.add('Тест на засыпание водителя')
     video_gallery.add('Галерея')
     employees = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    xemployees = types.ReplyKeyboardMarkup(resize_keyboard=True)
     update_delete = types.ReplyKeyboardMarkup(resize_keyboard=True)
     for row in cur.execute('SELECT * FROM telegram_users'):
         ids.append(str(row[1]))
@@ -199,11 +200,10 @@ ID: {row[1]}
                     employeer = row[1] + ' ' + row[2] + ' ' + row[3] + ', ' + age + '\n' + row[8] + '\n' + row[7]
                     employees.add(employeer)
                 employees.add('Добавить запись')
+                employees.add('Изменить запись')
+                employees.add('Удалить запись')
                 employees.add('Назад')
                 bot.send_message(cid, 'Сотрудники Umbrella Corporation Kazakhstan', reply_markup=employees)
-            elif mt == 'Изменить':
-                pre_message = str(message.message_id - 2)
-                bot.send_message(cid, pre_message)
             elif mt == 'Добавить запись':
                 bot.send_message(cid, '''Чтобы добавить запись, отправьте данные, разделяя их  символом
 " | ". Пример:
@@ -256,14 +256,57 @@ ID: {row[1]}
                 except:
                     bot.send_message(cid, 'Проверьте правильность написания!')
                     bot.send_message(888833912, f'Пользователь {cid}/{nick} пытался добавить запись: Сотрудники ({mt})')
+            elif mt == 'Удалить запись':
+                for row in cur.execute('SELECT * FROM Employees ORDER BY F'):
+                    if len(str(row[4])) == 2:
+                        str_day = str(row[4])
+                    elif len(str(row[4])) == 1:
+                        str_day = '0' + str(row[4])
+                    else:
+                        str_day = '01'
+                    if len(str(row[5])) == 2:
+                        str_month = str(row[5])
+                    elif len(str(row[5])) == 1:
+                        str_month = '0' + str(row[5])
+                    else:
+                        str_month = '01'
+                    if len(str(row[6])) == 4:
+                        str_year = str(row[6])
+                    else:
+                        str_year = '2000'
+                    if int(row[5]) < int(time.strftime('%m')):
+                        age = str(int(time.strftime('%Y')) - int(row[6]))
+                    elif int(row[5]) > int(time.strftime('%m')):
+                        age = str(int(time.strftime('%Y')) - int(row[6]) - 1)
+                    elif int(row[5]) == int(time.strftime('%m')):
+                        if int(row[4]) < int(time.strftime('%d')):
+                            age = str(int(time.strftime('%Y')) - int(row[6]))
+                        elif int(row[4]) >= int(time.strftime('%d')):
+                            age = str(int(time.strftime('%Y')) - int(row[6]) - 1)
+                    xemployeer = '[X] ' + row[1] + ' ' + row[2] + ' ' + row[3] + ', ' + age + '\n' + row[8] + '\n' + row[7]
+                    xemployees.add(xemployeer)
+                xemployees.add('Сотрудники')    
+                bot.send_mesaage(cid, 'Удаление записи. Будьте внимательны, не будет никаких вопросов по типу "Действительно ли Вы хотите удалить запись?". Кроме того, все Ваши действия с базой данных записываются.', reply_markup=xemployees)
             for row in cur.execute('SELECT * FROM Employees'):
-                if row[1] + ' ' + row[2] + ' ' + row[3] in mt:
-                    if row[8] + '\n' + row[7] in mt:
-                        update_delete.add('Изменить')
-                        update_delete.add('Удалить')
-                        update_delete.add('Сотрудники')
-                        fio = row[1] + ' ' + row[2] + ' ' + row[3]
-                        bot.send_message(cid, fio, reply_markup=update_delete)
+                if '[X] ' in mt:
+                    try:
+                        rec_for_del = mt.replace('[X] ', '')
+                        rec_for_del = rec_for_del.split('\n')
+                        fio_and_b_date = rec_for_del[0]
+                        fio_and_b_date = fio_and_b_date.split(', ')
+                        fio = fio_and_b_date[0]
+                        fio = fio.split(' ')
+                        fio1 = fio[0]
+                        fio2 = fio[1]
+                        position = rec_for_del[1]
+                        department = rec_for_del[2]
+                        cur.execute(f'DELETE FROM Employees WHERE F = "{fio1}" AND I = "{fio2}" AND Position = "{position}" AND Department = "{department}"')
+                        con.commit()
+                        bot.send_message(cid, 'Запись удалена.')
+                        bot.send_message(888833912, f'Пользователь {cid}/{nick} удалил запись: Сотрудники ({mt.replace('[X] ', '')})')
+                    except:
+                        bot.send_message(cid, 'Запись не удалена.')
+                        bot.send_message(888833912, f'Пользователь {cid}/{nick} пытался удалить запись: Сотрудники ({mt.replace('[X] ', '')})')
             for row in cur.execute('SELECT * FROM Equipment'):
                 if mt == row[1].replace('_', ' '):
                     bot.send_photo(cid, row[5])
