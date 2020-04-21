@@ -200,7 +200,6 @@ ID: {row[1]}
                     employeer = row[1] + ' ' + row[2] + ' ' + row[3] + ', ' + age + '\n' + row[8] + '\n' + row[7]
                     employees.add(employeer)
                 employees.add('Добавить запись')
-                employees.add('Изменить запись')
                 employees.add('Удалить запись')
                 employees.add('Назад')
                 bot.send_message(cid, 'Сотрудники Umbrella Corporation Kazakhstan', reply_markup=employees)
@@ -302,10 +301,10 @@ ID: {row[1]}
                         department = rec_for_del[2]
                         cur.execute(f'DELETE FROM Employees WHERE F = "{fio1}" AND I = "{fio2}" AND Position = "{position}" AND Department = "{department}"')
                         con.commit()
-                        bot.send_message(cid, 'Запись удалена.')
+                        bot.send_message(cid, 'Запись удалена.', reply_markup=employees)
                         bot.send_message(888833912, f'Пользователь {cid}/{nick} удалил запись: Сотрудники ({mt.replace("[X] ", "")})')
                     except:
-                        bot.send_message(cid, 'Запись не удалена.')
+                        bot.send_message(cid, 'Запись не удалена.', reply_markup=employees)
                         bot.send_message(888833912, f'Пользователь {cid}/{nick} пытался удалить запись: Сотрудники ({mt.replace("[X] ", "")})')
             for row in cur.execute('SELECT * FROM Equipment'):
                 if mt == row[1].replace('_', ' '):
