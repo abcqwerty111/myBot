@@ -310,7 +310,7 @@ ID: {row[1]}
                 if mt == row[1].replace('_', ' '):
                     bot.send_photo(cid, row[5])
                     time.sleep(0.1)
-                    answer = row[3]
+                    answer = row[3] + '\n' 'Подробнее здесь: ' + row[4]
                     bot.send_message(cid, answer, reply_markup=equipment)
 
     elif str(cid) not in ids:
